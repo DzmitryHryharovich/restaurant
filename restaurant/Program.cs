@@ -8,7 +8,6 @@ namespace restaurant
         bool isOpen = false;
         Room room = new Room();
         List<Visitor> visitors = new List<Visitor>();
-        List<int> freeTables = new List<int>();
         static void Main()
         {
             new Program().Control();
@@ -18,7 +17,7 @@ namespace restaurant
             Console.WriteLine("****************************");
             Console.WriteLine("Открыть ресторан - O");
             Console.WriteLine("Рарегистрировать посетителя - N");
-            Console.WriteLine("Свободные столики - F");
+            Console.WriteLine("Свободные места - F");
             string choice = Console.ReadLine();
             if (choice == "O")
             {
@@ -29,14 +28,14 @@ namespace restaurant
                 }
                 else Console.WriteLine(">>>Ресторан уже открыт!");
             }
-            //else if (choice == "N")
-            //{
-            //    if (isOpen == true) VisitorRegistration();
-            //    else Console.WriteLine(">>>Сначала нужно открыть ресторан!");
-            //}
+            else if (choice == "N")
+            {
+                if (isOpen == true) VisitorRegistration();
+                else Console.WriteLine(">>>Сначала нужно открыть ресторан!");
+            }
             else if (choice == "F")
             {
-                if (isOpen == true) FreeTables();
+                if (isOpen == true) Console.WriteLine($"Свободных мест осталось: {FreePlacesCountAll()}");
                 else Console.WriteLine(">>>Сначала нужно открыть ресторан!");
             }
             else Console.WriteLine("!!!Неопознанный ввод");
@@ -55,42 +54,71 @@ namespace restaurant
             for (int i = 0; i < amountTables; i++)
             {
                 room.tables.Add(new Table(i + 1, 2));
-                freeTables[i] = room.tables[i].id;
             }
             Console.WriteLine("Ресторан открыт! Добро пожаловать!");
-            Console.WriteLine($"Свободных официантов - {room.waiters.Count}\n Свободных столиков - {room.tables.Count}");
+            Console.WriteLine($"Свободных официантов - {room.waiters.Count}\nСвободных столиков - {room.tables.Count}");
         }
-        //public void VisitorRegistration()
-        //{
-        //    if (FreeTables().Count < 1) Console.WriteLine("Нет свободных столиков!");
-        //    else
-        //    {
-        //        Console.WriteLine("Введите имя клиента");
-        //        visitors.Add(new Visitor(Console.ReadLine()));
-        //        for (int i = 0; i < room.tables.Count; i++)
-        //        {
-        //            if (room.tables[i].CheckTableIsBusy() == false)
-        //            {
-        //                Console.WriteLine($"Столик номер {room.tables[i].id} свободен");
-        //                //room.tables[i].visitor = visitors[visitors.Count - 1];
-        //                //Console.WriteLine($"Стол {room.tables[i].id} забронирован на имя {room.tables[i].visitor.name}");
-        //                break;
-        //            }
-        //            else Console.WriteLine("Нет свободных столиков!");
-        //        }
-        //    }
-        //}
-        public List<int> FreeTables()
-        {  
-            freeTables.Clear();
+        public void VisitorRegistration()
+        {
+            if (FreeTablesCountAll(room) < 1) Console.WriteLine("Нет свободных столиков!");
+            else
+            {
+                Console.WriteLine("Введите имя клиента");
+                visitors.Add(new Visitor(Console.ReadLine()));
+                Console.WriteLine($"Укажите номер столика за который посадить {visitors[visitors.Count-1].name}?");
+                Console.WriteLine($"Свободные столики:->" );
+                for (int i = 0; i < FreeTables(room).Count; i++)//??????????????????????????????
+                {
+                    Console.Write($"|{i+1} - {FreeTables(room)[i].id}| ");
+                }
+                int choise = Int32.Parse(Console.ReadLine());
+                room.tables[choise-1].visitorsAtTable.Add(visitors[visitors.Count-1]);
+                Console.WriteLine($"Посититель {visitors[visitors.Count-1].name} - посажен за столик {FreeTables(room)[choise-1].id}!");
+            }
+        }
+        public int FreePlacesCountAll()
+        {
+            int amount = 0;
             for (int i = 0; i < room.tables.Count; i++)
             {
-                if (room.tables[i].CheckTableIsBusy() == false)
+                for (int j = 1; j < room.tables[i].places; j++)
                 {
-                    freeTables.Add(room.tables[i].id);
+                    amount += room.tables[i].places - room.tables[i].visitorsAtTable.Count;
                 }
             }
-            return freeTables;
+            return amount;
+        }
+        public int FreePlacesAtTable(Table table)
+        {
+            int amount = 0;
+            for (int i = 0; i < table.places; i++)
+            {
+                if (table.visitorsAtTable.Equals(null)) amount++;
+            }
+            return amount;
+        }
+        public bool CheckTableIsBusy(Table table)
+        {
+            if (FreePlacesAtTable(table) < table.places) return false;
+            else return true;
+        }
+        public int FreeTablesCountAll(Room room)
+        {
+            int amount = 0;
+            for (int i = 0; i < room.tables.Count; i++)
+            {
+                if (CheckTableIsBusy(room.tables[i]) == false) amount++;
+            }
+            return amount;
+        }
+        public List<Table> FreeTables(Room room)
+        {
+            List<Table> tables = new List<Table>();
+            for (int i = 0; i < room.tables.Count; i++)
+            {
+                if (CheckTableIsBusy(room.tables[i]) == false) tables.Add(room.tables[i]);
+            }
+            return tables;
         }
     }
 
@@ -112,29 +140,16 @@ namespace restaurant
     }
     public class Table
     {
+        public Table() { }
         public Table(int id, int places)
         {
             this.id = id;
             this.places = places;
             visitorsAtTable = new List<Visitor>(places);
         }
-        public int FreePlaces()
-        {
-            int amount = 0;
-            for (int i = 0; i < places; i++)
-            {
-                if (visitorsAtTable[i] == null) amount++;
-            }
-            return amount;
-        }
-        public bool CheckTableIsBusy()
-        {
-            if (FreePlaces() <= FreePlaces()) return true;
-            else return false;
-        }
         public List<Visitor> visitorsAtTable;
         public int id { get; }
-        public int places { get; }
+        public int places { get;}
     }
     public class Room
     {
