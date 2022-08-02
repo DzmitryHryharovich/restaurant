@@ -134,7 +134,7 @@ namespace restaurant
         }
         public List<Visitor> visitorsAtTable;
         public int id { get; }
-        public int places { get; }//
+        public int places { get; }
     }
     public class Room
     {
