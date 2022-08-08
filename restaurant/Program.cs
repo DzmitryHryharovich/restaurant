@@ -160,9 +160,9 @@ namespace restaurant
             {
                 int n = 1;
                 Console.WriteLine($"|Столик №{room.tables[i].id} | ");
-                foreach (var item in room.tables[i].visitorsAtTable)
+                foreach (Visitor item in room.tables[i].visitorsAtTable)
                 {
-                    if (item == null) Console.WriteLine($"место №{n++} Пусто");
+                    if (item.name == null) Console.WriteLine($"место №{n++} Пусто");
                     else Console.WriteLine($"место №{i + 1} {item.name}");
                 }
             }
@@ -184,7 +184,6 @@ namespace restaurant
     }
     public class Visitor : Human
     {
-        public Visitor() { }
         public Visitor(string name) { base.name = name; }
     }
     public class Table
