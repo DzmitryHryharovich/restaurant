@@ -91,7 +91,7 @@ namespace restaurant
                 for (int i = 0; i < FreeTablesCount(room).Count; i++)
                 {
                     if (FreeTablesCount(room)[i].id == choise)
-                    { FreeTablesCount(room)[i].visitorsAtTable.Add(visitors[visitors.Count - 1]); break; }
+                    { FreeTablesCount(room)[i].visitorsAtTable[i].name = visitors[visitors.Count - 1].name; break; }
                     else if (i == FreeTablesCount(room).Count - 1) { Console.WriteLine("Столика с таким номером нет, либо за ним нет свободных мест! Повторите ввод:"); goto again; }
                 }
                 Console.WriteLine($"Посититель {visitors[visitors.Count - 1].name} - посажен за столик №{choise}!");
@@ -114,13 +114,21 @@ namespace restaurant
             int amount = 0;
             for (int i = 0; i < room.tables.Count; i++)
             {
-                amount += room.tables[i].places - room.tables[i].visitorsAtTable.Count;
+                foreach (var item in room.tables[i].visitorsAtTable)
+                {
+                    if (item.name != null) amount++;
+                }
             }
             return amount;
         }
         public int FreePlacesCount(Table table)
         {
-            return table.places - table.visitorsAtTable.Count;
+            int amount = 0;
+            foreach (var item in table.visitorsAtTable)
+            {
+                if (item.name == null) amount++;
+            }
+            return amount;
         }
         public bool CheckTableIsBusy(Table table)
         {
@@ -158,12 +166,13 @@ namespace restaurant
             Console.WriteLine("+++++++++++++++++++++++++++++++++++++++++++++++++");
             for (int i = 0; i < room.tables.Count; i++)
             {
-                int n = 1;
+                int n = 0;
                 Console.WriteLine($"|Столик №{room.tables[i].id} | ");
                 foreach (Visitor item in room.tables[i].visitorsAtTable)
                 {
-                    if (item.name == null) Console.WriteLine($"место №{n++} Пусто");
-                    else Console.WriteLine($"место №{i + 1} {item.name}");
+                    n++;
+                    if (item.name == null) Console.WriteLine($"место №{n} Пусто");
+                    else Console.WriteLine($"место №{n} {item.name}");
                 }
             }
             Console.WriteLine("+++++++++++++++++++++++++++++++++++++++++++++++++");
@@ -184,6 +193,7 @@ namespace restaurant
     }
     public class Visitor : Human
     {
+        public Visitor() { }
         public Visitor(string name) { base.name = name; }
     }
     public class Table
@@ -193,6 +203,10 @@ namespace restaurant
             this.id = id;
             this.places = places;
             visitorsAtTable = new List<Visitor>(places);
+            for (int i = 0; i < places; i++)
+            {
+                visitorsAtTable.Add(new Visitor());
+            }
         }
         public List<Visitor> visitorsAtTable;
         public int id { get; set; }
