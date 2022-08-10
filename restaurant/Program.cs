@@ -10,9 +10,9 @@ namespace restaurant
         List<Visitor> visitors = new List<Visitor>();
         static void Main()
         {
-            new Program().Control();
+            new Program().Actions();
         }
-        public void Control()
+        public void Actions()
         {
             Console.WriteLine("****************************");
             Console.WriteLine("Открыть ресторан - O");
@@ -21,7 +21,9 @@ namespace restaurant
             Console.WriteLine("Свободные столики - TF");
             Console.WriteLine("Добавить столики - A");
             Console.WriteLine("Всего столиков в зале - T");
-            Console.WriteLine("Информация по все столикам - I");
+            Console.WriteLine("Информация по всем столикам - I");
+            Console.WriteLine("Освободить конкретное место - DP");
+            Console.WriteLine("Освободить весь столик - D");
             string choice = Console.ReadLine();
             if (choice == "O")
             {
@@ -62,8 +64,13 @@ namespace restaurant
                 if (isOpen == true) AllTablesInfo(room);
                 else Console.WriteLine(">>>Сначала нужно открыть ресторан!");
             }
+            else if (choice == "D")
+            {
+                if (isOpen == true) AllTablesInfo(room);
+                else Console.WriteLine(">>>Сначала нужно открыть ресторан!");
+            }
             else Console.WriteLine("!!!Неопознанный ввод");
-            Control();
+            Actions();
         }
         public void StartWorking()
         {
@@ -116,7 +123,7 @@ namespace restaurant
             {
                 foreach (var item in room.tables[i].visitorsAtTable)
                 {
-                    if (item.name != null) amount++;
+                    if (item.name == null) amount++;
                 }
             }
             return amount;
