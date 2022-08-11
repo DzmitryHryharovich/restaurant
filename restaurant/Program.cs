@@ -98,7 +98,16 @@ namespace restaurant
                 for (int i = 0; i < FreeTablesCount(room).Count; i++)
                 {
                     if (FreeTablesCount(room)[i].id == choise)
-                    { FreeTablesCount(room)[i].visitorsAtTable[i].name = visitors[visitors.Count - 1].name; break; }
+                    {
+                        for (int j = 0; j < FreeTablesCount(room)[i].visitorsAtTable.Capacity; j++)
+                        {
+                            if (FreeTablesCount(room)[i].visitorsAtTable[j].name == null)
+                            {
+                                FreeTablesCount(room)[i].visitorsAtTable[j].name = visitors[visitors.Count - 1].name; break;
+                            }
+                        }
+                        break;
+                    }
                     else if (i == FreeTablesCount(room).Count - 1) { Console.WriteLine("Столика с таким номером нет, либо за ним нет свободных мест! Повторите ввод:"); goto again; }
                 }
                 Console.WriteLine($"Посититель {visitors[visitors.Count - 1].name} - посажен за столик №{choise}!");
@@ -194,7 +203,7 @@ namespace restaurant
     {
         public string name;
     }
-    public class Waiter : Human
+    public class Waiter : Human 
     {
         //public Visitor visitor;
     }
