@@ -177,6 +177,21 @@ namespace restaurant
                 Console.WriteLine($"|№{FreeTablesCount(room)[i].id}(свободных мест:{FreePlacesCount(FreeTablesCount(room)[i])}) | ");
             }
         }
+        public void FullBusyTables(Room room)
+        {
+            for (int i = 0; i < room.tables.Count; i++)
+            {
+                int n = 0;
+                if (FreePlacesCount(room.tables[i]) > 0) continue;
+                Console.WriteLine($"|Столик №{room.tables[i].id} | ");
+                foreach (Visitor item in room.tables[i].visitorsAtTable)
+                {
+                    n++;
+                    if (item.name == null) Console.WriteLine($"место №{n} Пусто");
+                    else Console.WriteLine($"место №{n} {item.name}");
+                }
+            }
+        }
         public void AllTablesInfo(Room room)
         {
             Console.WriteLine("+++++++++++++++++++++++++++++++++++++++++++++++++");
@@ -192,6 +207,24 @@ namespace restaurant
                 }
             }
             Console.WriteLine("+++++++++++++++++++++++++++++++++++++++++++++++++");
+        }
+        public void ReleaseTable(Room room)//??????????????????????????????????????????????
+        {
+            Console.WriteLine("Выберите столик который нужно освободить");
+            FullBusyTables(room);
+            foreach (var item in room.tables[int.Parse(Console.ReadLine())].visitorsAtTable)
+            {
+                item.name = null;
+            }
+            //Console.WriteLine($"Столик №{} - освобожден!") ;
+        }
+        public void ReleasePlace(Table table,string name)
+        {
+            foreach (var item in table.visitorsAtTable)
+            {
+                if (item.name == name) item.name = null;
+                else Console.WriteLine("Нет такого имени за этим столиком");
+            }
         }
     }
 
