@@ -66,7 +66,7 @@ namespace restaurant
             }
             else if (choice == "D")
             {
-                if (isOpen == true) AllTablesInfo(room);
+                if (isOpen == true) ReleaseTable(room);
                 else Console.WriteLine(">>>Сначала нужно открыть ресторан!");
             }
             else Console.WriteLine("!!!Неопознанный ввод");
@@ -148,8 +148,8 @@ namespace restaurant
         }
         public bool CheckTableIsBusy(Table table)
         {
-            if (FreePlacesCount(table) > 0) return false;
-            else return true;
+            if (FreePlacesCount(table) < table.visitorsAtTable.Count) return true;
+            else return false;
         }
         public int TablesCountAll(Room room)
         {
@@ -177,21 +177,21 @@ namespace restaurant
                 Console.WriteLine($"|№{FreeTablesCount(room)[i].id}(свободных мест:{FreePlacesCount(FreeTablesCount(room)[i])}) | ");
             }
         }
-        public void FullBusyTables(Room room)
-        {
-            for (int i = 0; i < room.tables.Count; i++)
-            {
-                int n = 0;
-                if (FreePlacesCount(room.tables[i]) > 0) continue;
-                Console.WriteLine($"|Столик №{room.tables[i].id} | ");
-                foreach (Visitor item in room.tables[i].visitorsAtTable)
-                {
-                    n++;
-                    if (item.name == null) Console.WriteLine($"место №{n} Пусто");
-                    else Console.WriteLine($"место №{n} {item.name}");
-                }
-            }
-        }
+        //public void FullBusyTables(Room room)
+        //{
+        //    for (int i = 0; i < room.tables.Count; i++)
+        //    {
+        //        int n = 0;
+        //        if (FreePlacesCount(room.tables[i]) > 0) continue;
+        //        Console.WriteLine($"|Столик №{room.tables[i].id} | ");
+        //        foreach (Visitor item in room.tables[i].visitorsAtTable)
+        //        {
+        //            n++;
+        //            if (item.name == null) Console.WriteLine($"место №{n} Пусто");
+        //            else Console.WriteLine($"место №{n} {item.name}");
+        //        }
+        //    }
+        //}
         public void AllTablesInfo(Room room)
         {
             Console.WriteLine("+++++++++++++++++++++++++++++++++++++++++++++++++");
@@ -208,17 +208,45 @@ namespace restaurant
             }
             Console.WriteLine("+++++++++++++++++++++++++++++++++++++++++++++++++");
         }
-        public void ReleaseTable(Room room)//??????????????????????????????????????????????
+        public void ReleaseTable(Room room)
         {
-            Console.WriteLine("Выберите столик который нужно освободить");
-            FullBusyTables(room);
-            foreach (var item in room.tables[int.Parse(Console.ReadLine())].visitorsAtTable)
+            bool check = false;
+            List<Table> busyTables = new List<Table>();
+            foreach (var item in room.tables)
             {
-                item.name = null;
+                if(CheckTableIsBusy(item) == true)
+                {
+                    busyTables.Add(item);
+                }
             }
-            //Console.WriteLine($"Столик №{} - освобожден!") ;
+            if(busyTables.Count == 0)
+            {
+                Console.WriteLine("Все столики свободны!");
+                Actions();
+            }
+            Console.WriteLine("Выберите столик который нужно освободить");
+            Console.WriteLine("Занятые столики:");
+            foreach (var item in busyTables)
+            {
+                Console.WriteLine($"Столик №{item.id}");
+            }
+            int choise = int.Parse(Console.ReadLine());
+            for (int i = 0; i < room.tables.Count; i++)
+            {
+                if (choise == room.tables[i].id && CheckTableIsBusy(room.tables[i]) == true)
+                {
+                    foreach (var place in room.tables[i].visitorsAtTable)
+                    {
+                        place.name = null;
+                    }
+                    Console.WriteLine($"Столик №{room.tables[i].id} - освобожден!");
+                    check = true;
+                    break;
+                }
+            }
+            if (check == false) Console.WriteLine("Нет такого номера!");
         }
-        public void ReleasePlace(Table table,string name)
+        public void ReleasePlace(Table table, string name)
         {
             foreach (var item in table.visitorsAtTable)
             {
@@ -236,7 +264,7 @@ namespace restaurant
     {
         public string name;
     }
-    public class Waiter : Human 
+    public class Waiter : Human
     {
         //public Visitor visitor;
     }
